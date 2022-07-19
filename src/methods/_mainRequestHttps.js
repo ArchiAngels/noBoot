@@ -1,4 +1,4 @@
-const colorCLI = require('../color-cli/color.js');
+const colorCLI = require('../../color-cli/color.js');
 
 module.exports = function mainRequestHttps(options = {},fn){
     const http = require('https');
@@ -46,7 +46,7 @@ module.exports = function mainRequestHttps(options = {},fn){
             });
     
             res.on('end', () => {
-                console.log('No more data in response.');
+                colorCLI.warning('No more data in response.');
             });
         });
     

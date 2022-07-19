@@ -3,20 +3,42 @@ require('dotenv').config();
 const http = require('http');
 const port = process.env.PORT || 3001;
 const offset = require('./store/offset.js');
+const colorCLI = require("./color-cli/color.js");
 
-const login = require('./methods/logInToBot.js');
-const checkUpdates = require('./methods/checkUpdates.js');
-// const sendMessage = require('./methods/sendMessage.js');
-// const closeUpdate = require('./methods/closeUpdate.js');
+const login = require('./src/methods/logInToBot.js');
+const checkUpdates = require('./src/methods/checkUpdates.js');
+const sendMessage = require('./src/methods/sendMessage.js');
+const looking = require('./src/methods/lookingForUpdates.js');
 
 http.createServer((req,res)=>{
     let params =  req.url.split('/');
-    console.log(req.url,params);
+
+    colorCLI.warning(req.url,params);
+
     if(params[1] === 'apitest'){
         login(process.env.bot_token,res);
         
     }else if(params[1] === 'apitest2'){
-        checkUpdates(process.env.bot_token,res);
+        let currentOffset = offset.getAsInt();
+        looking(
+            res,
+            ()=>{
+                checkUpdates(process.env.bot_token,res,currentOffset).then(values=>{
+
+                        console.log(values);
+
+                        for(let update = 0; update < values.length; update++){
+                            let room_id = values[update].chat_ID;
+                            let msg = 'hi';
+                            sendMessage(process.env.bot_token,room_id,msg).then(()=>{
+                                offset.increaseState();
+                            })
+                        }
+                    
+                })
+            }
+        )
+        
     }
     else if(params[1] === 'offset'){
         if(params[2] === '+' || params[2] === 'increase'){
@@ -33,7 +55,9 @@ http.createServer((req,res)=>{
     }
     
     
-}).listen(port)
+}).listen({port:port},()=>{
+    colorCLI.succes(` Server run at port : ${port} `);
+})
 
 // login(process.env.token).then(value=>{
 //     console.log(value);

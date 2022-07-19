@@ -1,5 +1,5 @@
 const mainRequestHttps = require('./_mainRequestHttps.js');
-const colorCLI = require('../color-cli/color.js');
+const colorCLI = require('../../color-cli/color.js');
 
 module.exports = function Login(token,response){
     let options = {
