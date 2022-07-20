@@ -15,7 +15,7 @@ module.exports = function mainRequestHttps(options = {},fn){
 
     return new Promise(function(resolve,reject){
         let timeout = setTimeout(()=>{
-            console.log('time out');
+            console.log('mainRequestHttps __ time out');
             reject('time up')
         },5000);
 
@@ -76,7 +76,7 @@ function customPropertiesObj(options){
 }
 
 function isAllPropertiesArePassed(obj){
-    console.log('start parsing');
+    // console.log('start parsing');
     let requiredOptions = ['url','token'];
     let count = requiredOptions.length;
     let result = false;
@@ -89,12 +89,12 @@ function isAllPropertiesArePassed(obj){
     for(let elem in obj){
         if(requiredOptions.includes(elem)){
             count -= 1;
-            console.log(elem,count);
+            // console.log(elem,count);
         }
     }
 
     result = count > 0 ? false : true;
-    console.log('finish parsing', result);
+    // console.log('finish parsing', result);
     return result;
 
 }

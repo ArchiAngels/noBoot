@@ -4,11 +4,13 @@ const http = require('http');
 const port = process.env.PORT || 3001;
 const offset = require('./store/offset.js');
 const colorCLI = require("./color-cli/color.js");
+const URL_COMMANDS = './src/commands/commands';
 
 const login = require('./src/methods/logInToBot.js');
 const checkUpdates = require('./src/methods/checkUpdates.js');
 const sendMessage = require('./src/methods/sendMessage.js');
 const looking = require('./src/methods/lookingForUpdates.js');
+const updateCommands = require('./src/methods/updateAllCommands.js');
 
 http.createServer((req,res)=>{
     let params =  req.url.split('/');
@@ -50,6 +52,9 @@ http.createServer((req,res)=>{
         res.end(offset.getOffset());
         
     }
+    else if(params[1] === 'addCommand'){
+        updateCommands(process.env.bot_token,res);
+    } 
     else{
         res.end(process.env.name);
     }
