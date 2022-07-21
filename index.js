@@ -11,6 +11,7 @@ const checkUpdates = require('./src/methods/checkUpdates.js');
 const sendMessage = require('./src/methods/sendMessage.js');
 const looking = require('./src/methods/lookingForUpdates.js');
 const updateCommands = require('./src/methods/updateAllCommands.js');
+const userController = require('./store/userInfo.js');
 
 http.createServer((req,res)=>{
     let params =  req.url.split('/');
@@ -25,13 +26,15 @@ http.createServer((req,res)=>{
         looking(
             res,
             ()=>{
+                currentOffset = offset.getAsInt();
+                colorCLI.warning(currentOffset);
                 checkUpdates(process.env.bot_token,res,currentOffset).then(values=>{
 
                         console.log(values);
 
                         for(let update = 0; update < values.length; update++){
                             let room_id = values[update].chat_ID;
-                            let msg = 'hi';
+                            let msg = 'hi' +  (offset.getAsInt() + update);
                             sendMessage(process.env.bot_token,room_id,msg).then(()=>{
                                 offset.increaseState();
                             })

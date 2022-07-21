@@ -11,6 +11,8 @@ module.exports = function mainRequestHttps(options = {},fn){
     }
 
     options = customPropertiesObj(options);
+
+    colorCLI.warning(options.hostname + options.path);
     
 
     return new Promise(function(resolve,reject){
