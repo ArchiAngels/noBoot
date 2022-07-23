@@ -1,6 +1,6 @@
 const colorCLI = require('../../color-cli/color.js');
 
-module.exports = function mainRequestHttps(options = {},fn){
+module.exports = function mainRequestHttps(options = {},fn,timeOutMS = 5000){
     const http = require('https');
 
     let isAllOptions = isAllPropertiesArePassed(options);
@@ -19,7 +19,7 @@ module.exports = function mainRequestHttps(options = {},fn){
         let timeout = setTimeout(()=>{
             console.log('mainRequestHttps __ time out');
             reject('time up')
-        },5000);
+        },timeOutMS);
 
         function deleteTimeOut(e = false){
             clearTimeout(timeout);

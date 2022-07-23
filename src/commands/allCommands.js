@@ -1,6 +1,6 @@
 const FS = require('fs');
 const colorCLI = require('../../color-cli/color.js');
-let pathDirectory = './commands';
+let pathDirectory = './commandsName';
 
 module.exports = function getCommandsAsArray(path){
     pathDirectory = path;

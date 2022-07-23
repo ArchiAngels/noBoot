@@ -1,4 +1,5 @@
 let FS = require('fs');
+const colorCLI = require('../color-cli/color');
 
 let pathToUsers = __dirname+'/userInfo.json';
 let currentLastID;
@@ -6,7 +7,15 @@ let currentLastID;
 const createNewUserOptions = {
     name:'string',
     surname:'string',
-    email:'string',    
+    email:'string',
+    roomID:'integer',
+    fillFormState:0,
+    
+    // FORM__CODE  
+    // WISE INFORMATION
+    // {0} - enter name and surname
+    // {1} - enter email
+    // {2} - choose payment amount
 }
 
 let UserController = {
@@ -82,6 +91,57 @@ let UserController = {
             currentLastID = id;
         return id;
     },
+    getUserByRoomID(id = -1){
+        let usersGlobal = this.getUsers();
+
+        for(let i = 0; i < usersGlobal.users.length;i++){
+
+            if(usersGlobal.users[i].roomID === id){
+
+                return {userGlobals:usersGlobal,user:usersGlobal.users[i],idx:i};
+            }
+
+        }
+        console.log('no user with id::'+id);
+        return -1
+    },
+    addUserFirstAndLastNames:function(roomID =-1,firstName ='string',lastName='string'){
+        let userGlobals = this.getUserByRoomID(roomID);
+
+
+        let user = {
+            name:firstName,
+            surname:lastName,
+            roomID:roomID,
+            fillFormState:1,
+        }         
+        
+        userGlobals.userGlobals.users[userGlobals.idx] = {...user};
+    
+        this.setUsers({...userGlobals.userGlobals});
+
+        colorCLI.succes('Add name and lastanme');
+        console.log(this.getUsers());
+
+    },
+    addUserEmail:function(roomID = -1,email = 'string'){
+        let userGlobals = this.getUserByRoomID(roomID);
+
+        if(userGlobals === -1){
+            console.log("no find a user with this id");
+            console.log('state::',userGlobals.users.fillFormState)
+        }else{
+
+            let user = userGlobals.user;
+                user.email = email;
+                user.fillFormState = 2;
+
+            userGlobals.userGlobals.users[userGlobals.idx] = {...user};
+    
+            this.setUsers({...userGlobals.userGlobals});
+        }
+    },
+    
 };
 
 module.exports = UserController;
@@ -97,6 +157,9 @@ function __initDB(){
 
 
 function text_add(){
-    let anotherMe = this.createNewUser({name:"NoNameGuy",surname:"NoNameGuy",email:"NoNameGuy@mail.co"});
-    UserController.addNewUserToJSON(anotherMe);
+    let anotherMe = UserController.createNewUser({name:"NoNameGuy",surname:"NoNameGuy",email:"NoNameGuy@mail.co"});
+    UserController.addNewuser(anotherMe);
 }
+
+// __initDB();
+// text_add();

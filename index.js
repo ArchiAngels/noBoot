@@ -12,6 +12,7 @@ const sendMessage = require('./src/methods/sendMessage.js');
 const looking = require('./src/methods/lookingForUpdates.js');
 const updateCommands = require('./src/methods/updateAllCommands.js');
 const userController = require('./store/userInfo.js');
+const hintNextStep = require('./src/commands/CommandScripts/nextStep.js');
 
 http.createServer((req,res)=>{
     let params =  req.url.split('/');
@@ -35,6 +36,86 @@ http.createServer((req,res)=>{
                         for(let update = 0; update < values.length; update++){
                             let room_id = values[update].chat_ID;
                             let msg = 'hi' +  (offset.getAsInt() + update);
+                            // return 0;
+                            if(values[update].isCommand){
+                                if(values[update].text === '/next_step'){
+                                    msg = hintNextStep(process.env.bot_token,room_id);
+                                }
+                                if(values[update].text === '/start'){
+
+                                    let isUserExist = userController.getUserByRoomID(room_id);
+
+                                    if(isUserExist === -1){
+                                        msg = 'Здравствуйте, введите своё имя, фамилию латиницей, так как написано в Wise'
+                                        userController.createAndSaveUser({roomID:room_id,fillFormState:0});
+                                    }else{
+                                        let state = isUserExist.user.fillFormState;
+                                        if(state === 0){
+                                            msg = 'Здравствуйте, введите своё имя, фамилию латиницей, так как написано в Wise'
+                                        }
+                                        else if(state === 1){
+                                            msg = "Введите адрес электронной почты Wise, для зачисления средств."
+                                        }else if(state === 2){
+                                            msg = 'Выберите сумму пополнения:';
+                                        }
+                                    }
+                                }
+                                else if(values[update].CommandName === 'email'){
+                                    let regexEmail = new RegExp(/[a-z0-9]+@[a-z]+\.[a-z]{2,3}/gi);
+                                    let passedEmail = values[update].text;
+
+                                    let isPassed = passedEmail.match(regexEmail);
+
+                        
+                                    console.log('EMAIL::',passedEmail,isPassed);
+                                    // return 0;
+                                    if(isPassed){
+                                        userController.addUserEmail(room_id,passedEmail);
+                                        msg = 'Выберите сумму пополнения:';
+                                    }else{
+                                        msg = "Введите адрес электронной почты Wise, для зачисления средств."
+                                    }
+                                }
+                            }else{
+                                let isUserExist = userController.getUserByRoomID(room_id);
+                                console.log(values[update].text);
+                                
+
+                                    if(isUserExist === -1){
+                                        msg = 'Здравствуйте, введите своё имя, фамилию латиницей, так как написано в Wise'
+                                        userController.createAndSaveUser({roomID:room_id,fillFormState:0});
+                                    }else{
+                                        let state = isUserExist.user.fillFormState;
+                                        if(state === 0){
+                                            let fullnameWise = values[update].text;
+                                            console.log(fullnameWise);
+                                                fullnameWise = fullnameWise.split(' ');
+                                                console.log(fullnameWise);
+                                            userController.addUserFirstAndLastNames(room_id,fullnameWise[0],fullnameWise[1]);
+                                            msg = "Введите адрес электронной почты Wise, для зачисления средств."
+                                        }
+                                        else if(state === 1){
+                                            // let email = values[update].text;
+                                            let regexEmail = new RegExp(/[a-z0-9]+@[a-z]+\.[a-z]{2,3}/gi);
+                                            let passedEmail = values[update].text;
+
+                                            let isPassed = passedEmail.match(regexEmail);
+                        
+                                            console.log('EMAIL::',passedEmail,isPassed);
+                                            // return 0;
+                                            if(isPassed){
+                                                userController.addUserEmail(room_id,passedEmail);
+                                                msg = 'Выберите сумму пополнения:';
+                                            }else{
+                                                msg = "Введите адрес электронной почты Wise, для зачисления средств."
+                                            }
+                                            
+                                        }else if(state === 2){
+                                            msg = 'Выберите сумму пополнения:';
+                                        }
+                                    }
+                            }
+                            msg = encodeURIComponent(msg);
                             sendMessage(process.env.bot_token,room_id,msg).then(()=>{
                                 offset.increaseState();
                             })

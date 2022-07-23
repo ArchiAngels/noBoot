@@ -10,11 +10,9 @@ module.exports = function looking(res,fn){
         res.end(msg);
     }
     else{
-        colorCLI.succes(' start looking ');
         let ms = 2500 * 2;
 
         function loopOne(){
-            console.log('loopOne',ms);
             fn();
             setTimeout(loopOne,ms);
         }

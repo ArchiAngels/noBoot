@@ -43,8 +43,24 @@ module.exports = function checkUpdates(token,response,offset = -1){
 
                     updateInformation.chat_ID = update.message.from.id;
                     updateInformation.offsetID = update.update_id;
-                    updateInformation.command = update.message.text;
-                    updateInformation.who = update.message.from.first_name;
+                    updateInformation.text = update.message.text;
+
+                    if(update.message.entities){
+                        updateInformation.isCommand = true;
+                        updateInformation.CommandName = update.message.entities[0].type;
+                    }else{
+                        updateInformation.isCommand = false;
+                    }
+
+                    // updateInformation.isCommand = update.message.entities[0].type;
+                    console.log(update.message.entities);
+                    // update.message.entities.map((e,i)=>{
+                    //     console.log(e);
+
+                    //     // colorCLI.warning(i);
+                    // })
+                    updateInformation.Fn = update.message.from.first_name;
+                    updateInformation.Ln = update.message.from.last_name;
                     updateInformation.chat_message_id = update.message.message_id;
                                         
 
@@ -65,7 +81,7 @@ module.exports = function checkUpdates(token,response,offset = -1){
         return updatesAsArray;
         
     }).catch((reason=>{
-        colorCLI.error('here '+reason);
+        colorCLI.error('here (checkUpdates) '+reason);
         response.end('BAD ::'+reason);
         return [];
     }))
