@@ -1,25 +1,21 @@
 const userController = require('../../../store/userInfo.js');
-const sendMessage = require('../../methods/sendMessage.js');
+const nextStep = require('./nextStep.js');
 
-module.exports = function nextStep(token,roomID){
+module.exports = function start(roomID){
 
 
     let isUser = userController.getUserByRoomID(roomID);
     let msg ='';
 
     if(isUser === -1){
-        msg = 'Здравствуйте, введите своё имя, фамилию латиницей, так как написано в Wise'
-    }else{
-        let state = isUser.user.fillFormState;
         
-        if(state === 0){
-            msg = 'Здравствуйте, введите своё имя, фамилию латиницей, так как написано в Wise'        
-        }else if(state === 1){
-            msg = "Введите адрес электронной почты Wise, для зачисления средств.";
-        }else if(state === 2){
-            msg = 'Выберите сумму пополнения:';
-        }        
-    }
+        userController.initEmptyUser(roomID);
+    }else{
+        // nothing
+        userController.makeNewTransaction(roomID);
 
-    sendMessage(token,roomID,msg);
+    }
+    msg = nextStep(roomID);
+
+    return msg;
 }

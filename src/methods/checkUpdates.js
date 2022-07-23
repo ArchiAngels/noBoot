@@ -39,6 +39,10 @@ module.exports = function checkUpdates(token,response,offset = -1){
 
                     let updateInformation = {};
 
+                    if(update.edited_message){
+                        continue;
+                    }
+
                     // console.log(result,update);
 
                     updateInformation.chat_ID = update.message.from.id;
@@ -53,7 +57,7 @@ module.exports = function checkUpdates(token,response,offset = -1){
                     }
 
                     // updateInformation.isCommand = update.message.entities[0].type;
-                    console.log(update.message.entities);
+                    // console.log(update.message.entities);
                     // update.message.entities.map((e,i)=>{
                     //     console.log(e);
 
@@ -81,7 +85,7 @@ module.exports = function checkUpdates(token,response,offset = -1){
         return updatesAsArray;
         
     }).catch((reason=>{
-        colorCLI.error('here (checkUpdates) '+reason);
+        colorCLI.error('here (checkUpdates true) '+reason);
         response.end('BAD ::'+reason);
         return [];
     }))

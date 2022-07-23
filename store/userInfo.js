@@ -141,6 +141,96 @@ let UserController = {
             this.setUsers({...userGlobals.userGlobals});
         }
     },
+    deleteuserFromList:function(roomID = -1){
+        let userGlobals = this.getUserByRoomID(roomID);
+
+        if(userGlobals === -1){
+            console.log("no find a user with this id");
+            console.log('state::',userGlobals.users.fillFormState)
+        }else{
+
+            userGlobals.userGlobals.users.splice(userGlobals.idx,1);
+    
+            this.setUsers({...userGlobals.userGlobals});
+        }
+    },
+    initEmptyUser:function(roomID = -1){
+        let userGlobals = this.getUserByRoomID(roomID);
+
+        if(userGlobals === -1){
+            this.createAndSaveUser({roomID:roomID,fillFormState:0});
+        }else{
+
+        }
+        
+    },
+    userAcceptRules:function(roomID = -1){
+        let userGlobals = this.getUserByRoomID(roomID);
+
+        if(userGlobals === -1){
+            console.log("no find a user with this id");
+            console.log('state::',userGlobals.users.fillFormState)
+        }else{
+
+            let user = userGlobals.user;
+                user.acceptRules = true;
+                user.fillFormState = user.fillFormState +1;
+
+            userGlobals.userGlobals.users[userGlobals.idx] = {...user};
+
+            colorCLI.succes("USER HAS ACCEPT RULES",user.fillFormState);
+    
+            this.setUsers({...userGlobals.userGlobals});
+        }
+    },
+    addPossibleTransaction:function(roomID = -1,amount){
+        let userGlobals = this.getUserByRoomID(roomID);
+
+        if(userGlobals === -1){
+            console.log("no find a user with this id");
+            console.log('state::',userGlobals.users.fillFormState)
+        }else{
+
+            let user = userGlobals.user;
+                user.possibleTransaction = [];
+                user.possibleTransaction.push(amount);
+
+                user.fillFormState = user.fillFormState +1;
+
+            userGlobals.userGlobals.users[userGlobals.idx] = {...user};
+    
+            this.setUsers({...userGlobals.userGlobals});
+        }
+    },
+    generatePossibleTransactionHash:function(roomID = -1){
+        let userGlobals = this.getUserByRoomID(roomID);
+
+        if(userGlobals === -1){
+            console.log("no find a user with this id");
+            console.log('state::',userGlobals.users.fillFormState);
+        }else{
+
+            let Hash = `${userGlobals.user.roomID}/${userGlobals.user.possibleTransaction[0]}`;
+            return Hash;
+        }
+    },
+    makeNewTransaction:function(roomID = -1){
+        let userGlobals = this.getUserByRoomID(roomID);
+
+        if(userGlobals === -1){
+            console.log("no find a user with this id");
+            console.log('state::',userGlobals.users.fillFormState);
+        }else{
+
+            let user = userGlobals.user;
+
+            user.fillFormState = 2;
+
+            userGlobals.userGlobals.users[userGlobals.idx] = {...user};
+    
+            this.setUsers({...userGlobals.userGlobals});
+        }
+    }
     
 };
 
