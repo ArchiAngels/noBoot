@@ -172,8 +172,6 @@ let UserController = {
 
         if(userGlobals === -1){
             this.createAndSaveUser({roomID:roomID,fillFormState:0});
-        }else{
-
         }
         
     },
@@ -269,7 +267,65 @@ let UserController = {
     
             // this.setUsers({...userGlobals.userGlobals});
         }
-    }
+    },
+    isUserHaveNameAndSurname:function(roomID = -1){
+        let userGlobals = this.getUserByRoomID(roomID);
+        let result = {
+            name:false,
+            surname:false
+        }
+
+
+        if(userGlobals === -1){
+            console.log("no find a user with this id");
+            console.log('state::',userGlobals.users.fillFormState);
+        }else{
+
+            let user = userGlobals.user;
+
+            user.name ? result.name = true : 0;
+            user.surname ? result.surname = true : 0;
+        }
+
+        return result.name && result.surname;
+    },
+    isUserHaveEmail:function(roomID = -1){
+        let userGlobals = this.getUserByRoomID(roomID);
+        let result = {
+            email:false,
+        }
+
+
+        if(userGlobals === -1){
+            console.log("no find a user with this id");
+            console.log('state::',userGlobals.users.fillFormState);
+        }else{
+
+            let user = userGlobals.user;
+
+            user.email ? result.email = true : 0;
+        }
+
+        return result.email;
+    },
+    setUserFillFormState:function(roomID = -1,newState){
+        let userGlobals = this.getUserByRoomID(roomID);
+
+
+        if(userGlobals === -1){
+            console.log("no find a user with this id");
+            console.log('state::',userGlobals.users.fillFormState);
+        }else{
+
+            let user = userGlobals.user;
+
+            user.fillFormState = newState;
+
+            this.saveChanges(userGlobals,user);
+        }
+
+        
+    },
     
 };
 

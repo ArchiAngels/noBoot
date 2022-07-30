@@ -12,25 +12,41 @@ module.exports = function handleNoCommandText(roomID,message){
     };
 
     let isUserExist = userController.getUserByRoomID(roomID);
-    
-
-    // msg = nextStep(roomID);
 
     if(!isUserExist.idx){
         msg = nextStep(roomID);
     }else{
         let state = isUserExist.user.fillFormState;
 
-        // colorCLI.error('CURRENT STATE:::',state,isUserExist.user);
-        // console.log(state,isUserExist.user);
-        // colorCLI.error('CURRENT STATE:::',state);
-        // colorCLI.error('CURRENT STATE:::',state);
-        // console.log("handleNoCommandText::",message,message === '«Продолжить»',state);
+        // console.log(`\n\n\n`);
+        // console.log('email:',userController.isUserHaveEmail(roomID));
+        // colorCLI.error(userController.isUserHaveEmail(roomID));
+        // console.log('name,surname:',userController.isUserHaveNameAndSurname(roomID));
+        // colorCLI.error(userController.isUserHaveNameAndSurname(roomID));
+        // console.log(`\n\n\n`);
+
+
+        
+        let nameAndSurnameIsExtend = userController.isUserHaveNameAndSurname(roomID);
+
+        if(!nameAndSurnameIsExtend && state > 0){
+            userController.setUserFillFormState(roomID,0);
+            return msg = nextStep(roomID);
+        }
+
+        let emailIsExtend = userController.isUserHaveEmail(roomID);
+                
+        if(!emailIsExtend && state > 1){
+            userController.setUserFillFormState(roomID,1);
+            return msg = nextStep(roomID);
+        }
     
             if(state === 0){
     
                 let fullnameWise = message;
                     fullnameWise = fullnameWise.split(' ');
+
+                    console.log(message,fullnameWise);
 
                 if(fullnameWise.length === 2){
                     userController.addUserFirstAndLastNames(roomID,fullnameWise[0],fullnameWise[1]);
@@ -40,6 +56,10 @@ module.exports = function handleNoCommandText(roomID,message){
                 
             }
             else if(state === 1){
+
+                
+
+                
 
                 let regexEmail = new RegExp(/[a-z0-9]+@[a-z]+\.[a-z]{2,3}/gi);
                 let passedEmail = message;
@@ -56,6 +76,8 @@ module.exports = function handleNoCommandText(roomID,message){
                 msg = nextStep(roomID);
                 
             }else if(state === 2){
+
+                
 
                 if(message === '«Продолжить»'){
                     userController.userAcceptRules(roomID);
@@ -78,7 +100,7 @@ module.exports = function handleNoCommandText(roomID,message){
 
                 msg = nextStep(roomID);
             }else{
-                msg = nextStep(room_id);
+                msg = nextStep(roomID);
             }
     
         

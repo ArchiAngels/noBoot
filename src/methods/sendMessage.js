@@ -8,6 +8,7 @@ module.exports = function sendMessage(token,chatID,msg){
         keyboardMarkup = {
             keyboard:msg.keyboard
         }
+        msg.resize_keyboard ? keyboardMarkup.resize_keyboard = true:0;
     }else{
         keyboardMarkup = {
             remove_keyboard:true

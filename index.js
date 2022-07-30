@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-let AutoLookingForUpdates = true;
+let AutoLookingForUpdates = false;
 
 const http = require('http');
 const port = process.env.PORT || 3002;
@@ -23,10 +23,17 @@ const sendButtons = require('./src/methods/sendButtons.js');
 const deleteUserProperties = require('./src/commands/CommandScripts/deleteuserProperties.js');
 const support = require('./src/commands/CommandScripts/support.js');
 const FreshMoneyTypes = require('./store/money.js');
+
+
+
 http.createServer((req,res)=>{
     let params =  req.url.split('/');
 
     colorCLI.warning(req.url,params);
+
+    res.setHeader(
+        "Access-Control-Allow-Origin","*"
+    )
 
     if(params[1] === 'apitest'){
         login(process.env.bot_token,res);
@@ -57,9 +64,9 @@ http.createServer((req,res)=>{
         res.end(jsonUsers);
         // res.end(userController.getUsers());
     }else if(params[1] === 'TurnOnOffBot'){
-        res.setHeader(
-            "Access-Control-Allow-Origin","*"
-        )
+        // res.setHeader(
+        //     "Access-Control-Allow-Origin","*"
+        // )
         AutoLookingForUpdates = !AutoLookingForUpdates;
 
         let result = JSON.stringify({
@@ -76,6 +83,15 @@ http.createServer((req,res)=>{
 
         
         
+    }
+    else if(params[1] === 'getCurrentStateOfBot'){
+
+        result = {
+            isOK:true,
+            isBotON:AutoLookingForUpdates
+        }
+        result = JSON.stringify(result);
+        res.end(result);
     }
     else{
         res.end(process.env.name);

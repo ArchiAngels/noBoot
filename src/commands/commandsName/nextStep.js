@@ -1,4 +1,4 @@
 module.exports = {
-    command:'/next_step',
-    description:'Подсказывает следующий шаг'
+    command:'/show_step',
+    description:'Подсказывает текущий шаг'
 }

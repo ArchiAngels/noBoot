@@ -2,6 +2,9 @@ const mainRequestHttps = require('./_mainRequestHttps.js');
 const colorCLI = require('../../color-cli/color.js');
 
 module.exports = function checkUpdates(token,response,offset = -1){
+    // let allowed_types = ['message']
+
+    // allowed_types = JSON.stringify(allowed_types);
     let options = {
         url:`getUpdates${offset > 0? `?offset=${offset}` : ''}`,
         token:token,
