@@ -23,5 +23,5 @@ module.exports = function me(roomID){
     }
 
     // msg = encodeURIComponent(msg);
-    return msg;
+    return {message:msg};
 }

@@ -28,6 +28,12 @@ let UserController = {
         let newFileData = JSON.stringify(obj);
         FS.writeFileSync(pathToUsers,newFileData)
     },
+    saveChanges:function(userGlobals,needToSave = {}){
+
+        userGlobals.userGlobals.users[userGlobals.idx] = {...needToSave};    
+        this.setUsers({...userGlobals.userGlobals});
+
+    },
     getUserByID:function(id = -1){
 
         let usersGlobal = this.getUsers();
@@ -52,13 +58,13 @@ let UserController = {
         }
         let user = users.user;
     
-        
-    
         user = {...user,...options};
+
+        this.saveChanges(users,user);
     
-        users.userGlobals.users[users.idx] = {...user};
+        // users.userGlobals.users[users.idx] = {...user};
     
-        this.setUsers({...users.userGlobals});
+        // this.setUsers({...users.userGlobals});
     
     
     },
@@ -116,9 +122,10 @@ let UserController = {
             fillFormState:1,
         }         
         
-        userGlobals.userGlobals.users[userGlobals.idx] = {...user};
+        this.saveChanges(userGlobals,user);
+        // userGlobals.userGlobals.users[userGlobals.idx] = {...user};
     
-        this.setUsers({...userGlobals.userGlobals});
+        // this.setUsers({...userGlobals.userGlobals});
 
         colorCLI.succes('Add name and lastanme');
         console.log(this.getUsers());
@@ -136,9 +143,11 @@ let UserController = {
                 user.email = email;
                 user.fillFormState = 2;
 
-            userGlobals.userGlobals.users[userGlobals.idx] = {...user};
+            this.saveChanges(userGlobals,user);
+
+            // userGlobals.userGlobals.users[userGlobals.idx] = {...user};
     
-            this.setUsers({...userGlobals.userGlobals});
+            // this.setUsers({...userGlobals.userGlobals});
         }
     },
     deleteuserFromList:function(roomID = -1){
@@ -149,9 +158,13 @@ let UserController = {
             console.log('state::',userGlobals.users.fillFormState)
         }else{
 
+
+
             userGlobals.userGlobals.users.splice(userGlobals.idx,1);
+
+            this.saveChanges(userGlobals,userGlobals);
     
-            this.setUsers({...userGlobals.userGlobals});
+            // this.setUsers({...userGlobals.userGlobals});
         }
     },
     initEmptyUser:function(roomID = -1){
@@ -176,11 +189,13 @@ let UserController = {
                 user.acceptRules = true;
                 user.fillFormState = user.fillFormState +1;
 
-            userGlobals.userGlobals.users[userGlobals.idx] = {...user};
+            // userGlobals.userGlobals.users[userGlobals.idx] = {...user};
+
+            this.saveChanges(userGlobals,user);
 
             colorCLI.succes("USER HAS ACCEPT RULES",user.fillFormState);
     
-            this.setUsers({...userGlobals.userGlobals});
+            // this.setUsers({...userGlobals.userGlobals});
         }
     },
     addPossibleTransaction:function(roomID = -1,amount){
@@ -197,9 +212,11 @@ let UserController = {
 
                 user.fillFormState = user.fillFormState +1;
 
-            userGlobals.userGlobals.users[userGlobals.idx] = {...user};
+            this.saveChanges(userGlobals,user);
+
+            // userGlobals.userGlobals.users[userGlobals.idx] = {...user};
     
-            this.setUsers({...userGlobals.userGlobals});
+            // this.setUsers({...userGlobals.userGlobals});
         }
     },
     generatePossibleTransactionHash:function(roomID = -1){
@@ -226,9 +243,31 @@ let UserController = {
 
             user.fillFormState = 2;
 
-            userGlobals.userGlobals.users[userGlobals.idx] = {...user};
+            this.saveChanges(userGlobals,user);
+
+            // userGlobals.userGlobals.users[userGlobals.idx] = {...user};
     
-            this.setUsers({...userGlobals.userGlobals});
+            // this.setUsers({...userGlobals.userGlobals});
+        }
+    },
+    transactionSuccesfullyGoes:function(roomID = -1){
+        let userGlobals = this.getUserByRoomID(roomID);
+
+        if(userGlobals === -1){
+            console.log("no find a user with this id");
+            console.log('state::',userGlobals.users.fillFormState);
+        }else{
+
+            let user = userGlobals.user;
+
+            user.fillFormState = 6;
+            user.succesfullyTransactions.push(user.possibleTransaction.pop());
+
+            this.saveChanges(userGlobals,user);
+
+            // userGlobals.userGlobals.users[userGlobals.idx] = {...user};
+    
+            // this.setUsers({...userGlobals.userGlobals});
         }
     }
     

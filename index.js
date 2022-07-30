@@ -1,7 +1,9 @@
 require('dotenv').config();
 
+let AutoLookingForUpdates = true;
+
 const http = require('http');
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3002;
 const offset = require('./store/offset.js');
 const colorCLI = require("./color-cli/color.js");
 const URL_COMMANDS = './src/commands/commands';
@@ -19,7 +21,8 @@ const email = require('./src/commands/CommandScripts/email.js');
 const handleNoCommandText = require('./src/commands/CommandScripts/noCommandController.js');
 const sendButtons = require('./src/methods/sendButtons.js');
 const deleteUserProperties = require('./src/commands/CommandScripts/deleteuserProperties.js');
-
+const support = require('./src/commands/CommandScripts/support.js');
+const FreshMoneyTypes = require('./store/money.js');
 http.createServer((req,res)=>{
     let params =  req.url.split('/');
 
@@ -29,72 +32,7 @@ http.createServer((req,res)=>{
         login(process.env.bot_token,res);
         
     }else if(params[1] === 'apitest2'){
-        let currentOffset = offset.getAsInt();
-        looking(
-            res,
-            ()=>{
-                currentOffset = offset.getAsInt();
-                colorCLI.warning(currentOffset);
-                checkUpdates(process.env.bot_token,res,currentOffset).then(values=>{
-
-                        console.log(values);
-
-                        for(let update = 0; update < values.length; update++){
-                            let room_id = values[update].chat_ID;
-                            let msg = {};
-                            let messageFromClient = values[update].text;
-                            // return 0;
-                            if(values[update].isCommand){
-                                if(messageFromClient === '/next_step'){
-                                    msg = hintNextStep(room_id);
-                                }else if(messageFromClient === '/me'){
-                                    msg.message = aboutMe(room_id);
-                                }else if(messageFromClient === '/start'){
-                                    msg = startInit(room_id);
-                                }else if(values[update].CommandName === 'email'){
-                                    msg = email(room_id,messageFromClient);
-                                }
-                                // else if(messageFromClient === '/delete_my_inforamtion'){
-                                //     msg.message = deleteUserProperties(room_id);
-                                // }
-                            }else{
-                                msg = handleNoCommandText(room_id,messageFromClient);
-                            }   
-
-                            colorCLI.warning(msg.message,msg === process.env.sendButtons);
-
-                            if(msg.message === process.env.sendButtons ){
-                                let options_keyboard = [        
-                                    [{text:50}],
-                                    [{text:100}],
-                                    [{text:250}],
-                                    [{text:500}],
-                                    [{text:1000}],
-                                    [{text:2000}],
-                                ]
-
-                                options_keyboard = options_keyboard.map((e)=>{
-                                    e[0].text += ' USDT';
-                                })
-
-
-                                sendButtons(process.env.bot_token,room_id,options_keyboard).then(()=>{
-                                    offset.increaseState();
-                                });
-                            }else{
-
-                                msg.message = encodeURIComponent(msg.message);
-
-                                sendMessage(process.env.bot_token,room_id,msg).then(()=>{
-                                    offset.increaseState();
-                                })
-                            }
-                            
-                        }
-                    
-                })
-            }
-        )
+        mainCicle(req,res);
         
     }
     else if(params[1] === 'offset'){
@@ -109,9 +47,99 @@ http.createServer((req,res)=>{
     }
     else if(params[1] === 'addCommand'){
         updateCommands(process.env.bot_token,res);
+    }else if(params[1] === 'userControl'){
+        res.setHeader(
+            "Access-Control-Allow-Origin","*"
+        )
+        let users = userController.getUsers();
+        let jsonUsers = JSON.stringify(users);
+        // console.log(jsonUsers)
+        res.end(jsonUsers);
+        // res.end(userController.getUsers());
+    }else if(params[1] === 'TurnOnOffBot'){
+        res.setHeader(
+            "Access-Control-Allow-Origin","*"
+        )
+        AutoLookingForUpdates = !AutoLookingForUpdates;
+
+        let result = JSON.stringify({
+            isOK:true,
+            botIsWorking:AutoLookingForUpdates
+        })
+
+        if(AutoLookingForUpdates){
+            // rerestar bot
+            mainCicle(res);
+        }else{
+            res.end(result);
+        }
+
+        
+        
     }
     else{
         res.end(process.env.name);
+    }
+
+    function mainCicle(res){
+        let currentOffset = offset.getAsInt();
+        looking(
+            res,
+            ()=>{
+                currentOffset = offset.getAsInt();
+                colorCLI.warning(currentOffset);
+                if(AutoLookingForUpdates){
+                    colorCLI.succes('bot run');
+
+                    checkUpdates(process.env.bot_token,res,currentOffset).then(values=>{
+
+                        console.log(values);
+
+                        for(let update = 0; update < values.length; update++){
+                            let room_id = values[update].chat_ID;
+                            let msg = {};
+                            let messageFromClient = values[update].text;
+                            // return 0;
+                            if(values[update].isCommand){
+                                if(messageFromClient === '/next_step'){
+                                    msg = hintNextStep(room_id);
+                                }else if(messageFromClient === '/me'){
+                                    msg = aboutMe(room_id);
+                                }else if(messageFromClient === '/start'){
+                                    msg = startInit(room_id);
+                                }else if(values[update].CommandName === 'email'){
+                                    msg = email(room_id,messageFromClient);
+                                }
+                                else if(messageFromClient === '/support'){
+                                    msg = support();
+                                }else{
+                                    msg = hintNextStep(room_id);
+                                }
+                                // else if(messageFromClient === '/delete_my_inforamtion'){
+                                //     msg.message = deleteUserProperties(room_id);
+                                // }
+                            }else{
+                                msg = handleNoCommandText(room_id,messageFromClient);
+                            }   
+
+                            colorCLI.warning(msg.message,msg === process.env.sendButtons);
+
+                            msg.message = encodeURIComponent(msg.message);
+
+                            sendMessage(process.env.bot_token,room_id,msg).then(()=>{
+                                offset.increaseState();
+                            })
+                            
+                        }
+                    
+                })
+
+                }else{
+                    colorCLI.error('botOff');
+                }
+                
+            }
+        )
     }
     
     
