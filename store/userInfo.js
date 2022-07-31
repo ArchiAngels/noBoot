@@ -120,6 +120,7 @@ let UserController = {
             surname:lastName,
             roomID:roomID,
             fillFormState:1,
+            userID:this.getID(),
         }         
         
         this.saveChanges(userGlobals,user);
@@ -252,14 +253,16 @@ let UserController = {
         let userGlobals = this.getUserByRoomID(roomID);
 
         if(userGlobals === -1){
+            console.log(userGlobals);
             console.log("no find a user with this id");
-            console.log('state::',userGlobals.users.fillFormState);
         }else{
 
             let user = userGlobals.user;
 
             user.fillFormState = 6;
-            user.succesfullyTransactions.push(user.possibleTransaction.pop());
+            user.succesfullyTransactions = user.succesfullyTransactions || [];
+            let possibleTransaction = user.possibleTransaction.pop();
+            user.succesfullyTransactions.push(possibleTransaction);
 
             this.saveChanges(userGlobals,user);
 
@@ -308,7 +311,7 @@ let UserController = {
 
         return result.email;
     },
-    setUserFillFormState:function(roomID = -1,newState){
+    setUserFillFormState:function(roomID = -1,newState = 0){
         let userGlobals = this.getUserByRoomID(roomID);
 
 

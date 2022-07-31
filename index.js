@@ -93,6 +93,24 @@ http.createServer((req,res)=>{
         result = JSON.stringify(result);
         res.end(result);
     }
+    else if(params[1] === 'setSuccesTransaction'){
+        
+        let roomID = +params[2];
+        console.log(roomID);
+        if(roomID){
+            let msg = {};
+            msg.message = encodeURIComponent('Успешно пополнено');
+            userController.transactionSuccesfullyGoes(roomID);
+            sendMessage(process.env.bot_token,roomID,msg);
+            res.end('ok');
+        }else{
+            res.end('NOTok');
+        }
+
+        
+        
+        
+    }
     else{
         res.end(process.env.name);
     }
