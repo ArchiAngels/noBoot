@@ -21,14 +21,6 @@ module.exports = function checkUpdates(token,response,offset = -1){
     return mainRequestHttps(options,whatNeedToDo).then(value=>{
         let msg = ``;
 
-        // if(!value.ok){
-
-        //     msg = `\t${value.error_code}\n\t${value.description}`;
-        //     response.end(msg);
-        //     colorCLI.error(msg);
-        //     return [];
-        // }
-
         for(let elem in value){
             
             if(elem === 'result'){
@@ -51,8 +43,18 @@ module.exports = function checkUpdates(token,response,offset = -1){
                         updateInformation.text = update.message.text;
     
                         if(update.message.entities){
-                            updateInformation.isCommand = true;
-                            updateInformation.CommandName = update.message.entities[0].type;
+                            let text = updateInformation.text.includes('id');
+                            let commandName = update.message.entities[0].type;
+                            if(text){
+                                let phoneEvent = commandName === 'phone_number';
+                                let emailEvent = commandName === 'email'
+                                if(phoneEvent || emailEvent){
+                                    updateInformation.isCommand = false;
+                                }
+                            }else{
+                                updateInformation.isCommand = true;
+                                updateInformation.CommandName = commandName;
+                            }
                         }else{
                             updateInformation.isCommand = false;
                         }

@@ -1,27 +1,37 @@
 const mainRequestHttps = require('./_mainRequestHttps.js');
 const colorCLI = require('../../color-cli/color.js');
-let getAllCommands = require('../commands/allCommands.js');
+let getAllCommands = require('../commands/_mainCommandBuilder.js');
 
-const path = __dirname + '/../commands/commandsName';
+const path = __dirname + '/../commands';
+let userCommandPath = path + '/commandsName';
+let adminCommandPath = path + '/commandAdminName';
 
 module.exports = async function updateAllCommands(token,response){
-    let allCommands = await getAllCommands(path);
 
-    // console.log(allCommands[0]);
+    let users = await getAllCommands(userCommandPath);
+    let admins = await getAllCommands(adminCommandPath);
+    
+    let allCommands = [...users,...admins];
+    
+
+    _updaterContainer(allCommands,token,response);
+    
+};
+
+async function _updaterContainer(allCommands,token,response){
+    
 
     for(let i=0; i < allCommands.length;i++){
         allCommands[i].description = encodeURIComponent(allCommands[i].description);
         allCommands[i].command = encodeURIComponent(allCommands[i].command)
     }
 
-    let commandsAsJson = JSON.stringify(allCommands)
+    let commandsAsJson = JSON.stringify(allCommands);
 
     let options = {
         url:`setMyCommands?commands=${commandsAsJson}`,
         token:token,
     };
-
-    // return colorCLI.error(options.url);
 
     function whatNeedToDo(response){
         colorCLI.succes('_mainRequestHttps ' + response.statusCode);
@@ -35,4 +45,4 @@ module.exports = async function updateAllCommands(token,response){
         response.end('BAD ::'+reason);
         return [];
     }));
-};
+}

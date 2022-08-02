@@ -2,6 +2,7 @@ const userController = require('../../../store/userInfo.js');
 const nextStep = require('./nextStep.js');
 const colorCLI = require('../../../color-cli/color.js');
 const FreshMonetTypes = require('../../../store/money.js');
+const noCommandAdminController = require('./noCommandAdminController.js');
 
 module.exports = function handleNoCommandText(roomID,message){
 
@@ -16,33 +17,30 @@ module.exports = function handleNoCommandText(roomID,message){
     if(!isUserExist.idx){
         msg = nextStep(roomID);
     }else{
-        let state = isUserExist.user.fillFormState;
 
-        // console.log(`\n\n\n`);
-        // console.log('email:',userController.isUserHaveEmail(roomID));
-        // colorCLI.error(userController.isUserHaveEmail(roomID));
-        // console.log('name,surname:',userController.isUserHaveNameAndSurname(roomID));
-        // colorCLI.error(userController.isUserHaveNameAndSurname(roomID));
-        // console.log(`\n\n\n`);
+        console.log(isUserExist.user.isAdmin,isUserExist.user.way);
+        if(isUserExist.user.isAdmin && isUserExist.user.way === 2){
+            return noCommandAdminController(roomID,message);
+        }else{
+            let state = isUserExist.user.fillFormState;
+        
+            let nameAndSurnameIsExtend = userController.isUserHaveNameAndSurname(roomID);
 
+            if(!nameAndSurnameIsExtend && state > 0){
+                userController.setUserFillFormState(roomID,0);
+                return msg = nextStep(roomID);
+            }
+
+            let emailIsExtend = userController.isUserHaveEmail(roomID);
+                    
+            if(!emailIsExtend && state > 1){
+                userController.setUserFillFormState(roomID,1);
+                return msg = nextStep(roomID);
+            }
 
         
-        let nameAndSurnameIsExtend = userController.isUserHaveNameAndSurname(roomID);
-
-        if(!nameAndSurnameIsExtend && state > 0){
-            userController.setUserFillFormState(roomID,0);
-            return msg = nextStep(roomID);
-        }
-
-        let emailIsExtend = userController.isUserHaveEmail(roomID);
-                
-        if(!emailIsExtend && state > 1){
-            userController.setUserFillFormState(roomID,1);
-            return msg = nextStep(roomID);
-        }
-    
             if(state === 0){
-    
+
                 let fullnameWise = message;
                     fullnameWise = fullnameWise.split(' ');
 
@@ -57,13 +55,9 @@ module.exports = function handleNoCommandText(roomID,message){
             }
             else if(state === 1){
 
-                
-
-                
-
                 let regexEmail = new RegExp(/[a-z0-9]+@[a-z]+\.[a-z]{2,3}/gi);
                 let passedEmail = message;
-    
+
                 let isPassed = passedEmail.match(regexEmail);
 
                 console.log(isPassed,passedEmail);
@@ -77,8 +71,6 @@ module.exports = function handleNoCommandText(roomID,message){
                 
             }else if(state === 2){
 
-                
-
                 if(message === '«Продолжить»'){
                     userController.userAcceptRules(roomID);
                 }
@@ -86,7 +78,7 @@ module.exports = function handleNoCommandText(roomID,message){
 
             }else if(state === 3){
                 let result = FreshMonetTypes.filter((e) => e === message);
-    
+
                 if(result.length !== 0){
                     userController.addPossibleTransaction(roomID,result[0]);
                 }
@@ -102,6 +94,7 @@ module.exports = function handleNoCommandText(roomID,message){
             }else{
                 msg = nextStep(roomID);
             }
+        }
     
         
     }

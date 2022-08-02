@@ -1,7 +1,7 @@
 const commandBuilder = require('./_mainCommandBuilder.js');
 
 
-let pathDirectory = './commandsName';
+let pathDirectory = './commandAdminName';
 
 
 return commandBuilder(pathDirectory); 

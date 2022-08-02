@@ -137,7 +137,6 @@ let UserController = {
 
         if(userGlobals === -1){
             console.log("no find a user with this id");
-            console.log('state::',userGlobals.users.fillFormState)
         }else{
 
             let user = userGlobals.user;
@@ -156,7 +155,6 @@ let UserController = {
 
         if(userGlobals === -1){
             console.log("no find a user with this id");
-            console.log('state::',userGlobals.users.fillFormState)
         }else{
 
 
@@ -181,7 +179,6 @@ let UserController = {
 
         if(userGlobals === -1){
             console.log("no find a user with this id");
-            console.log('state::',userGlobals.users.fillFormState)
         }else{
 
             let user = userGlobals.user;
@@ -202,7 +199,6 @@ let UserController = {
 
         if(userGlobals === -1){
             console.log("no find a user with this id");
-            console.log('state::',userGlobals.users.fillFormState)
         }else{
 
             let user = userGlobals.user;
@@ -223,7 +219,6 @@ let UserController = {
 
         if(userGlobals === -1){
             console.log("no find a user with this id");
-            console.log('state::',userGlobals.users.fillFormState);
         }else{
 
             let Hash = `${userGlobals.user.roomID}/${userGlobals.user.possibleTransaction[0]}`;
@@ -235,12 +230,12 @@ let UserController = {
 
         if(userGlobals === -1){
             console.log("no find a user with this id");
-            console.log('state::',userGlobals.users.fillFormState);
         }else{
 
             let user = userGlobals.user;
 
             user.fillFormState = 2;
+            user.way = 1;
 
             this.saveChanges(userGlobals,user);
 
@@ -281,7 +276,6 @@ let UserController = {
 
         if(userGlobals === -1){
             console.log("no find a user with this id");
-            console.log('state::',userGlobals.users.fillFormState);
         }else{
 
             let user = userGlobals.user;
@@ -301,7 +295,6 @@ let UserController = {
 
         if(userGlobals === -1){
             console.log("no find a user with this id");
-            console.log('state::',userGlobals.users.fillFormState);
         }else{
 
             let user = userGlobals.user;
@@ -317,7 +310,6 @@ let UserController = {
 
         if(userGlobals === -1){
             console.log("no find a user with this id");
-            console.log('state::',userGlobals.users.fillFormState);
         }else{
 
             let user = userGlobals.user;
@@ -329,6 +321,89 @@ let UserController = {
 
         
     },
+    setAdmin:function(roomID = -1,admin = false){
+
+        let userGlobals = this.getUserByRoomID(roomID);
+
+        if(userGlobals === -1){
+            console.log('No user with that id');   
+        }else{
+            let user = userGlobals.user;
+
+            user.isAdmin = admin;
+            user.way = 2;
+
+            if(admin){
+                user.adminState = 0;
+            }else{
+                delete user.adminState;
+            }
+
+            
+
+            this.saveChanges(userGlobals,user);
+        }
+    },
+    addNotifyuserAboutResultOfTransaction:function(adminRoomID = -1,userRoomID = -1){
+        colorCLI.error('add new');
+        let userGlobals = this.getUserByRoomID(userRoomID);
+        let admin = this.getUserByRoomID(adminRoomID)
+
+        if(admin === -1){
+            console.log('adminNotFound');
+        }
+        if(userGlobals === -1){
+            console.log('No user with that id');   
+        }else{
+            let user = userGlobals.user;
+
+            admin.user.userNotify = userRoomID;
+            admin.user.adminState = 1;         
+
+            this.saveChanges(userGlobals,admin.user);
+        }
+    },
+    sentInfoamtion:function(roomID = -1){
+        let userGlobals = this.getUserByRoomID(roomID);
+
+        if(userGlobals === -1){
+            console.log('No user with that id');   
+        }else{
+            let user = userGlobals.user;
+
+            user.userNotify = '';
+            user.adminState = 2;         
+
+            this.saveChanges(userGlobals,user);
+        }
+    },
+    resetAdminState:function(roomID = -1){
+        let userGlobals = this.getUserByRoomID(roomID);
+
+        if(userGlobals === -1){
+            console.log('No user with that id');   
+        }else{
+            let user = userGlobals.user;
+
+            user.adminState = 0;         
+
+            this.saveChanges(userGlobals,user);
+        }
+    },
+    changeWay:function(roomID = -1,way = 1){
+        let userGlobals = this.getUserByRoomID(roomID);
+
+        if(userGlobals === -1){
+            console.log('No user with that id');   
+        }else{
+            let user = userGlobals.user;
+
+            user.way = way;         
+
+            this.saveChanges(userGlobals,user);
+        }
+       
+    }
     
 };
 

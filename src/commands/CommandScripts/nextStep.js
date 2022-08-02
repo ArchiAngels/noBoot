@@ -81,7 +81,10 @@ module.exports = function nextStep(roomID){
         }else if(state === 6){
             msg.message = 'Поздравляем средства успешно зачислены!';
         msg.keyboardTemplate(['«Продолжить»']);
-        }        
+        }else if(state === 7){
+            msg.message = 'Увы, но к сожалению средства не были зачислены!';
+        msg.keyboardTemplate(['«Продолжить»']);
+        }    
     }
 
     // msg = encodeURIComponent(msg);
