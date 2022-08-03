@@ -45,17 +45,26 @@ module.exports = function getUsersWaitingToConfirmTheirWalletProcess(roomID,isMe
 
         let usersWithTransaction = users.filter(e => e.possibleTransaction && e.possibleTransaction.length > 0 && e.roomID);
 
+        
+
         let usersEmailAndMoney = usersWithTransaction.map((e)=>{
             // return {email:e.email,money:e.possibleTransaction[0]}
             return e.possibleTransaction.map((item,idx)=>{
                 return `Емейл:${e.email}\nСумма:${item}\nid:${e.roomID}\nNrOrder:${idx}`;
             })
         });
+        let result = [];
+        for(let i =0; i < usersEmailAndMoney.length;i++){
+            result = [...result,...usersEmailAndMoney[i]];
+        }
+        // usersEmailAndMoney = [...usersEmailAndMoney[0],...usersEmailAndMoney[1]];
+        // console.log(usersEmailAndMoney);
+        // console.log(result);
 
         if(usersEmailAndMoney.length === 0){
             msg.message = 'Нету пользователей';
         }else{
-            msg.keyboardTemplate(...usersEmailAndMoney);
+            msg.keyboardTemplate(result);
         }
 
     
