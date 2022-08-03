@@ -80,10 +80,10 @@ module.exports = function nextStep(roomID){
             msg.message = `Ожидайте зачисления средств, если информация правильная и сумма совпадает, с той что, вы указали, время зачисления средств 1-5 минут.`
         }else if(state === 6){
             msg.message = 'Поздравляем средства успешно зачислены!';
-        msg.keyboardTemplate(['«Продолжить»']);
+        msg.keyboardTemplate(['/start']);
         }else if(state === 7){
             msg.message = 'Увы, но к сожалению средства не были зачислены!';
-        msg.keyboardTemplate(['«Продолжить»']);
+        msg.keyboardTemplate(['/support']);
         }    
     }
 

@@ -11,7 +11,7 @@ const colorCLI = require("./color-cli/color.js");
 const updateCommands = require('./src/methods/updateAllCommands.js');
 const userController = require('./store/userInfo.js');
 const {mainCycle,startStopCycle} = require('./src/methods/_mainLifeCycle.js');
-const succesTransaction = require('./src/methods/succesTransaction.js');
+const sendStateTransaction = require('./src/methods/sendInfoAboutTransaction.js');
 
 
 
@@ -74,7 +74,7 @@ http.createServer((req,res)=>{
         
         let roomID = +params[2];
         if(roomID){
-            succesTransaction(roomID,process.env.bot_token);
+            sendStateTransaction(roomID,process.env.bot_token,true);
             res.end('ok');
         }else{
             res.end('NOTok');

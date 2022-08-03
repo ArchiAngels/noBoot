@@ -1,6 +1,6 @@
 const userController = require('../../../store/userInfo.js');
 const nextAdminStep = require('./nextStepAdmins.js');
-const succesTransaction = require('../../methods/succesTransaction.js');
+const sendStateTransaction = require('../../methods/sendInfoAboutTransaction.js');
 
 
 module.exports = function noCommandAdminController(roomID,message){
@@ -21,27 +21,44 @@ module.exports = function noCommandAdminController(roomID,message){
             let adminState = isAdmin.user.adminState;
 
             if(adminState === 0){
-                let isRoomID = message.split('id:');
-                isRoomID = parseInt(isRoomID[isRoomID.length -1]);
-                console.log(`\n\n\n${isRoomID} ::: ${adminState}\n\n\n`);
+                if(message.includes('\n')){
+                    let messageAsKeyValue = message.split('\n').map(e=>{return e.split(':')});
 
-                if(isRoomID){
+                    let id = messageAsKeyValue.filter(e=> e[0] === 'id');
+                    let NrOrder = messageAsKeyValue.filter(e=>e[0] === 'NrOrder');
+    
+                    console.log(id,NrOrder);
+                    let isRoomID = parseInt(id[0][1]);
+                    let isOrder = parseInt(NrOrder[0][1]);
+                    
                     console.log(`\n\n\n${isRoomID} ::: ${adminState}\n\n\n`);
-                    userController.addNotifyuserAboutResultOfTransaction(roomID,isRoomID);
-                    console.log(`\n\n\n${isRoomID} ::: ${adminState}\n\n\n`);
+    
+                    if(isRoomID){
+                        console.log(`\n\n\n${isRoomID} ::: ${adminState}\n\n\n`);
+                        let result = userController.addNotifyuserAboutResultOfTransaction(roomID,isRoomID,isOrder);
+                        if(result.isOK){
+                            console.log(result);
+                            console.log(`\n\n\n${isRoomID} ::: ${adminState}\n\n\n`);
+                        }else{
+                            console.log('something bad');
+                        }
+                        
+    
+                    }
                 }
+                
 
                 msg = nextAdminStep(roomID);
 
             }else if(adminState === 1){
                 if(message === 'Положительный'){
-                    succesTransaction(isAdmin.user.userNotify,process.env.bot_token)
-                    msg = nextAdminStep(roomID);
-                    userController.resetAdminState(roomID);
-
+                    sendStateTransaction(isAdmin.user.userNotify,process.env.bot_token,true);                    
                 }else if(message === 'Отрицательный'){
-                    msg.message = 'in progrtess';
-                };
+                    sendStateTransaction(isAdmin.user.userNotify,process.env.bot_token,false);
+                };                
+                userController.sentInformation(roomID);
+                msg = nextAdminStep(roomID);
+                userController.resetAdminState(roomID);
 
 
             }

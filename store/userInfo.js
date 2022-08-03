@@ -202,7 +202,7 @@ let UserController = {
         }else{
 
             let user = userGlobals.user;
-                user.possibleTransaction = [];
+                user.possibleTransaction = user.possibleTransaction ? user.possibleTransaction : [];
                 user.possibleTransaction.push(amount);
 
                 user.fillFormState = user.fillFormState +1;
@@ -255,17 +255,44 @@ let UserController = {
             let user = userGlobals.user;
 
             user.fillFormState = 6;
-            user.succesfullyTransactions = user.succesfullyTransactions || [];
-            let possibleTransaction = user.possibleTransaction.pop();
+            user.succesfullyTransactions = user.succesfullyTransactions? user.succesfullyTransactions : [];
+            let possibleTransaction = user.possibleTransaction.splice(user.orderIdx,1)[0];
             user.succesfullyTransactions.push(possibleTransaction);
 
+            user.orderIdx = 0;
+
             this.saveChanges(userGlobals,user);
+
+            return {amount:possibleTransaction};
 
             // userGlobals.userGlobals.users[userGlobals.idx] = {...user};
     
             // this.setUsers({...userGlobals.userGlobals});
         }
     },
+    transactionFailureGoes:function(roomID = -1){
+        let userGlobals = this.getUserByRoomID(roomID);
+
+        if(userGlobals === -1){
+            console.log(userGlobals);
+            console.log("no find a user with this id");
+        }else{
+
+            let user = userGlobals.user;
+
+            user.fillFormState = 7;
+            user.badTransactions = user.badTransactions? user.badTransactions : [];
+            let badTransaction = user.possibleTransaction.splice(user.orderIdx,1)[0];
+            user.badTransactions.push(badTransaction);
+
+            user.orderIdx = 0;
+
+            this.saveChanges(userGlobals,user);
+
+            return {amount:badTransaction};
+        }
+    },
+
     isUserHaveNameAndSurname:function(roomID = -1){
         let userGlobals = this.getUserByRoomID(roomID);
         let result = {
@@ -344,26 +371,44 @@ let UserController = {
             this.saveChanges(userGlobals,user);
         }
     },
-    addNotifyuserAboutResultOfTransaction:function(adminRoomID = -1,userRoomID = -1){
-        colorCLI.error('add new');
+    addNotifyuserAboutResultOfTransaction:function(adminRoomID = -1,userRoomID = -1,orderIdx = 0){
+        colorCLI.error('add new '+orderIdx);
         let userGlobals = this.getUserByRoomID(userRoomID);
-        let admin = this.getUserByRoomID(adminRoomID)
+        let admin = this.getUserByRoomID(adminRoomID);
+        let output = {isOK:false};
 
         if(admin === -1){
             console.log('adminNotFound');
+            return output;
         }
         if(userGlobals === -1){
             console.log('No user with that id');   
+            return output;
         }else{
+            
+            let admin_u = admin.user;
+            admin_u.userNotify = userRoomID;
+            admin_u.adminState = 1;     
+            
+            this.saveChanges(admin,admin_u);
+
+
+
+            userGlobals = this.getUserByRoomID(userRoomID);
             let user = userGlobals.user;
+            user.orderIdx = orderIdx; 
 
-            admin.user.userNotify = userRoomID;
-            admin.user.adminState = 1;         
+            this.saveChanges(userGlobals,user);
 
-            this.saveChanges(userGlobals,admin.user);
+
+            
+            output.adminState = 1;
+            output.isOK = true;
         }
+
+        return output;
     },
-    sentInfoamtion:function(roomID = -1){
+    sentInformation:function(roomID = -1){
         let userGlobals = this.getUserByRoomID(roomID);
 
         if(userGlobals === -1){
@@ -372,6 +417,7 @@ let UserController = {
             let user = userGlobals.user;
 
             user.userNotify = '';
+            user.orderIdx = 0;
             user.adminState = 2;         
 
             this.saveChanges(userGlobals,user);
@@ -404,7 +450,7 @@ let UserController = {
         }
        
     }
-    
+
 };
 
 module.exports = UserController;

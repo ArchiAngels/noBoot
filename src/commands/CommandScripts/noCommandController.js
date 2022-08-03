@@ -3,6 +3,7 @@ const nextStep = require('./nextStep.js');
 const colorCLI = require('../../../color-cli/color.js');
 const FreshMonetTypes = require('../../../store/money.js');
 const noCommandAdminController = require('./noCommandAdminController.js');
+const sendNotificationToAdmins = require('../../methods/sendNotificationToAdmins.js');
 
 module.exports = function handleNoCommandText(roomID,message){
 
@@ -87,7 +88,8 @@ module.exports = function handleNoCommandText(roomID,message){
                 
             }else if(state === 4){
                 if(message === '«Продолжить»'){
-                    userController.userAcceptRules(roomID);                    
+                    userController.userAcceptRules(roomID);       
+                    sendNotificationToAdmins(process.env.bot_token);             
                 }
 
                 msg = nextStep(roomID);
