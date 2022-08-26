@@ -3,7 +3,7 @@ require('dotenv').config();
 let AutoLookingForUpdates = false;
 
 const http = require('http');
-const port = process.env.PORT || 3002;
+const port = process.env.PORT || 8080;
 
 const offset = require('./store/offset.js');
 const colorCLI = require("./color-cli/color.js");
@@ -17,11 +17,9 @@ const sendStateTransaction = require('./src/methods/sendInfoAboutTransaction.js'
 
 http.createServer((req,res)=>{
     let params =  req.url.split('/');
-
-    let isWebhook = req.url.includes('?');
     
-    console.log(req.url,'----',params,isWebhook);
-    colorCLI.warning(req.url,'----',params,isWebhook);
+    console.log(req.url,'----',params);
+    colorCLI.warning(req.url,'----',params);
 
     res.setHeader(
         "Access-Control-Allow-Origin","*"
@@ -95,16 +93,21 @@ http.createServer((req,res)=>{
             res.end('NotOk');
         }
     }
-    else if (params[1] === 'update' || isWebhook){
+    else if (params[1] === 'update'){
         // update obj'c here
-        let webhookParam = params[1].split('?');
-        console.log('update',webhookParam);
-        const fs = require('fs');
-        console.log(req.url);
+        req.on('data',(chunk)=>{
+            chunk = chunk.toString();
+            console.log('uopdate',chunk);
 
-        let toTxt = webhookParam+'\n\n\n';
+            let toTxt = chunk+'\n\n\n';
+            const fs = require('fs');
 
-        fs.appendFileSync((__dirname+'/testRemoteStore/history.txt'),toTxt);
+            fs.appendFileSync((__dirname+'/testRemoteStore/history.txt'),toTxt);
+        })
+
+       
+
+        
         // res.writeHead(307,{
         //     "Content-Type": "application/json",
         //     "Cache-Control": "no-cache",
@@ -117,7 +120,7 @@ http.createServer((req,res)=>{
 
         let txt = fs.readFileSync((__dirname+'/testRemoteStore/history.txt'));
         res.end(txt);
-    }else if (params[1] === 'testUpdates'){
+    }else if (params[1] === 'testUpdatesWithUrl'){
         let objMess = {
             "update_id":10000,
             "message":{
@@ -147,6 +150,12 @@ http.createServer((req,res)=>{
             "Cache-Control": "no-cache"
         })
         res.end();
+    }
+    else if (params[1] === 'testUpdatesWithPOST'){
+            const me = require('./test.js').getw;
+            me();
+            res.end();
+            console.log('deprecated');
     }
     else{
         res.end(process.env.name);
