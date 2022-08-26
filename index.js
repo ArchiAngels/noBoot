@@ -97,12 +97,23 @@ http.createServer((req,res)=>{
         // update obj'c here
         req.on('data',(chunk)=>{
             chunk = chunk.toString();
-            console.log('uopdate',chunk);
 
             let toTxt = chunk+'\n\n\n';
             const fs = require('fs');
 
             fs.appendFileSync((__dirname+'/testRemoteStore/history.txt'),toTxt);
+
+            chunk = JSON.parse(chunk);
+            console.log(chunk);
+
+            const getNeccessaryInfo = require('./src/methods/webhookUpdate.js').asnwerUpdate;
+
+            let data = getNeccessaryInfo(chunk);
+            const sendMain = require('./src/methods/webhookCycle.js')._webhookMain;
+
+            let answer = sendMain(data);
+
+
         })
 
        
